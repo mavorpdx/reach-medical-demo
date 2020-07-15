@@ -63,9 +63,48 @@ Window {
 
     signal submitTextField(string text)
 
-    //  StackLayout {
-    //    id: stackMain
-    //    currentIndex: 0
+    function doVal(mouse) {
+        if (mouse < 0) mouse = 0;
+        if (mouse > myBarBase) mouse = myBarBase;
+        var val = 100 - (parseInt( (mouse / myBarBase ) * 100));
+        return  val
+    }
+
+    function doIt(val, repeater) {
+        var theNum = parseInt(repeater.count - (val / 5))
+        for (var i = 0; i < repeater.count; i++) {
+            if (theNum > i ) {
+                repeater.itemAt(i).color = MyStyle.barGraphOffColor
+            } else {
+                repeater.itemAt(i).color = MyStyle.barGraphOnColor
+            }
+        }
+    }
+
+    //Function to get the date with the format "Weekday, Month day (Eg. Monday, June 10)"
+    function getDate() {
+        var date = new Date();
+        var weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        var weekday = weekdays[date.getDay()];
+        var month = months[date.getMonth()];
+        var day = date.getDate();
+        //var secs = date.getTime();
+        return weekday + ", " + month + " " + day
+    }
+
+    //Function to get the local time
+    function getTime() {
+        var time = new Date().toLocaleTimeString([], {
+            hour: '2-digit'
+        }, {
+            minute: '2-digit'
+        }).toString()
+        var hour = time.slice(1, 2) === ":" ? time.slice(0, 1) : time.slice(0, 2)
+        var minute = time.slice(1, 2) === ":" ? time.slice(2, 4) : time.slice(3, 5)
+        var secs = time.slice(1, 2) === ":" ? time.slice(5, 7) : time.slice(6, 8)
+        return hour + ":" + minute + ":" + secs
+    }
 
     Rectangle {
         id: main
@@ -79,7 +118,6 @@ Window {
             top: parent.top
             left: parent.left
         }
-
 
         FontLoader {
             id: sourceSansLight;
@@ -95,13 +133,6 @@ Window {
         }
 
         property int buttonsAnimationX: 760
-/*        property color mustard: "#c2b59b"
-        property color purple: "#662D91"
-        property color green: "#39B54A"
-        property color blue: "#2075BC"
-        //property color textButtoncolor: MyStyle.propertyValueColor
-*/
-
         property int circleDuration: 10
         property int gifDuration: 150
         property int gifDelay: 10
@@ -434,7 +465,7 @@ Window {
                 Rectangle {
                     id: clockRow
                     width: 50
-                    height: hourLabel.implicitHeight
+                    height: timeLabel.implicitHeight
                     color: MyStyle.backgroundColor
 
                     anchors {
@@ -443,73 +474,24 @@ Window {
                         left: parent.left
                     }
 
-                    //Function to split and set the time
-                    function setTime() {
-//                        console.log("Global = " + MyGlobal.screenHeight + " Main = " + MyGlobal.screenHeight);
-                        var time = new Date().toLocaleTimeString([], {
-                            hour: '2-digit'
-                        }, {
-                            minute: '2-digit'
-                        }).toString()
-                        var hour = time.slice(1, 2) === ":" ? time.slice(0, 1) : time.slice(0, 2)
-                        var minute = time.slice(1, 2) === ":" ? time.slice(2, 4) : time.slice(3, 5)
-                        var am_pm = time.slice(1, 2) === ":" ? time.slice(5, 7) : time.slice(6, 8)
-                        hourLabel.text = hour
-                        minutesLabel.text = minute
-                        am_pmLabel.text = am_pm
-                    }
-
                     Text {
-                        id: hourLabel
+                        id: timeLabel
                         font.pixelSize: fontSize14
                         color: MyStyle.propertyValueColor
                         anchors {
                             left: parent.left
                         }
-
-                        Text {
-                            id: colonLabel
-                            font.pixelSize: fontSize14
-                            text: ":"
-                            anchors {
-                                left: hourLabel.right;
-                                bottom: parent.bottom
-                            }
-                            color: MyStyle.propertyValueColor
-                        }
-
-                        Text {
-                            id: minutesLabel
-                            font.pixelSize: fontSize14
-                            color: MyStyle.propertyValueColor
-                            anchors {
-                                left: colonLabel.right;
-                                bottom: parent.bottom
-                            }
-                        }
-
-                        Text {
-                            id: am_pmLabel
-                            font.pixelSize: fontSize13
-                            leftPadding: 5
-                            bottomPadding: 1
-                            color: MyStyle.propertyValueColor
-                            anchors {
-                                left: minutesLabel.right;
-                                bottom: parent.bottom
-                            }
-                        }
                     }
-                    //Timer to update the time using the setTime() function"
+
+                    //Timer to update the time using the getTime() function"
                     Timer {
                         id: timeTimer
                         interval: 1000
                         repeat: true
                         running: true
                         triggeredOnStart: true
-                        onTriggered: clockRow.setTime()
+                        onTriggered: timeLabel.text = getTime()
                     }
-
                 } //rectangle
 
                 NumberAnimation {
@@ -534,30 +516,16 @@ Window {
                     }
                     color: MyStyle.propertyValueColor
 
-                    //Function to set the date with the format "Weekday, Month day (Eg. Monday, June 10)"
-                    function setDate() {
-                        var date = new Date();
-                        var weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                        var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-                        var weekday = weekdays[date.getDay()];
-                        var month = months[date.getMonth()];
-                        var day = date.getDate();
-
-                        var secs = date.getTime();
-
-                        currentDateLabel.text = weekday + ", " + month + " " + day
-                    }
                 }
 
-                //Timer to update the date using the setDate() function"
+                //Timer to update the date using the getDate() function"
                 Timer {
                     id: dateTimer
                     interval: 1000
                     repeat: true
                     running: true
                     triggeredOnStart: true
-                    onTriggered: currentDateLabel.setDate()
+                    onTriggered: currentDateLabel.text = getDate()
                 }
             }  //HospitalName
         } //row
@@ -817,17 +785,6 @@ Window {
                 height: fontSize80 * 2 + fontSize40
                 color: MyStyle.backgroundColor
 
-                function doIt(val) {
-                    var theNum = parseInt(repeater.count - (val / 5))
-                    for (var i = 0; i < repeater.count; i++) {
-                        if (theNum > i ) {
-                            repeater.itemAt(i).color = MyStyle.barGraphOffColor
-                        } else {
-                            repeater.itemAt(i).color = MyStyle.barGraphOnColor
-                        }
-                    }
-                }
-
                 Text {
                     id: elementTextSaline
                     anchors {
@@ -853,7 +810,8 @@ Window {
                     font.family: sourceSansLight.name
 
                     onTextChanged: {
-                        salineBox.doIt(MyGlobal.salineValue);
+                        console.log("SALINE CHANGED ", MyGlobal.salineValue);
+                        doIt(MyGlobal.salineValue, repeater);
                     }
                 }
 
@@ -901,49 +859,32 @@ Window {
                         running: true
                         triggeredOnStart: true
                         onTriggered: {
-                            salineBox.doIt(MyGlobal.salineValue);
+                            doIt(MyGlobal.salineValue, repeater);
                         }
                     }  //Timer
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var base = myBarNum * (myBarSpace + myBarHeight)
-                            var Y = mouseY
-                            if (Y < 0) Y = 0;
-                            if (Y > myBarBase) Y = myBarBase;
-                            var val = parseInt((myBarBase - Y) / 2)
+                            var val = doVal(mouseY)
+                            doIt(val, repeater);
                             elementTextSalineVal.text = val
                             MyGlobal.salineValue = val
-                            salineBox.doIt(val);
                         }  //onClicked
 
                         onReleased: {
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextSalineVal.text = val
-                                MyGlobal.salineValue = val
-                                salineBox.doIt(val);
-                                submitTextField("Saline.value = " + elementTextSalineVal.text)
+                            var val = doVal(mouseY)
+                            doIt(MyGlobal.salineValue, repeater);
+                            elementTextSalineVal.text = val
+                            MyGlobal.salineValue = val
+                            submitTextField("Saline.value=" + elementTextSalineVal.text)
                         }  //onReleased:
 
                         onPositionChanged: {
-                            var myI = 0;
-                            for (myI = 0; myI < repeater.count; myI++) {
-                                if (repeater.itemAt(myI).y >= mouseY) {
-                                    repeater.itemAt(myI).color = MyStyle.barGraphOnColor
-                                } else {
-                                    repeater.itemAt(myI).color = MyStyle.barGraphOffColor
-                                }
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextSalineVal.text = val
-                                MyGlobal.salineValue = val
-                            }
+                            var val = doVal(mouseY);
+                            doIt(val, repeater);
+                            elementTextSalineVal.text = val
+                            MyGlobal.salineValue = val
                         } //onPositionChanged
                     }  //MouseArea
                 }  //Rectangle
@@ -965,18 +906,6 @@ Window {
                 width: fontSize80 + fontSize20
                 height: fontSize80 * 2 + fontSize40
                 color: MyStyle.backgroundColor
-
-
-                function doIt(val) {
-                    var theNum = parseInt(repeater1.count - (val / 5))
-                    for (var i = 0; i < repeater1.count; i++) {
-                        if (theNum > i ) {
-                            repeater1.itemAt(i).color = MyStyle.barGraphOffColor
-                        } else {
-                            repeater1.itemAt(i).color = MyStyle.barGraphOnColor
-                        }
-                    }
-                }
 
                 Text {
                     id: elementTextHiCor
@@ -1003,7 +932,7 @@ Window {
                     font.family: sourceSansLight.name
 
                     onTextChanged: {
-                        hiCorBox.doIt((MyGlobal.hiCorValue))
+                        doIt(MyGlobal.hiCorValue, repeater1);
                     }
                 }
 
@@ -1051,50 +980,32 @@ Window {
                         running: true
                         triggeredOnStart: true
                         onTriggered: {
-                            hiCorBox.doIt(MyGlobal.hiCorValue);
+                            doIt(MyGlobal.hiCorValue, repeater1);
                         }
                     }  //Timer
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var base = myBarNum * (myBarSpace + myBarHeight)
-                            var Y = mouseY
-                            if (Y < 0) Y = 0;
-                            if (Y > myBarBase) Y = myBarBase;
-                            var val = parseInt((myBarBase - Y) / 2)
-                            elementTextHicorVal.text = val
-                            MyGlobal.hiCorValue = val
-                            hiCorBox.doIt(val);
+                            var val = doVal(mouseY);
+                            elementTextHicorVal.text = val;
+                            MyGlobal.hiCorValue = val;
+                            doIt(val, repeater1);
                         } //onClicked:
 
                         onReleased: {
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextHicorVal.text = val
-                                MyGlobal.hiCorValue = val
-                                hiCorBox.doIt(val);
-                                submitTextField("Hicor.value = " + elementTextHicorVal.text)
+                            var val = doVal(mouseY);
+                            elementTextHicorVal.text = val;
+                            MyGlobal.hiCorValue = val;
+                            doIt(val, repeater1);
+                            submitTextField("Hicor.value=" + elementTextHicorVal.text)
                         }  //onReleased:
 
                         onPositionChanged: {
-                            var myI = 0;
-                            for (myI = 0; myI < repeater1.count; myI++) {
-
-                                if (repeater1.itemAt(myI).y >= mouseY) {
-                                    repeater1.itemAt(myI).color = MyStyle.barGraphOnColor
-                                } else {
-                                    repeater1.itemAt(myI).color = MyStyle.barGraphOffColor
-                                }
-
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextHicorVal.text = val
-                            }
+                            var val = doVal(mouseY);
+                            doIt(val, repeater1);
+                            elementTextHicorVal.text = val;
+                            MyGlobal.hiCorValue = val
                         } //onPositionChanged
                     }  //MouseArea
                 }  //Rectangle
@@ -1115,17 +1026,6 @@ Window {
                 width: fontSize80 + fontSize20
                 height: fontSize80 * 2 + fontSize40
                 color: MyStyle.backgroundColor
-
-                function doIt(val) {
-                    var theNum = parseInt(repeater2.count - (val / 5))
-                    for (var iii = 0; iii < repeater2.count; iii++) {
-                        if (theNum > iii ) {
-                            repeater2.itemAt(iii).color = MyStyle.barGraphOffColor
-                        } else {
-                            repeater2.itemAt(iii).color = MyStyle.barGraphOnColor
-                        }
-                    }
-                }
 
                 Text {
                     id: elementTextGlucagon
@@ -1152,7 +1052,7 @@ Window {
                     font.family: sourceSansLight.name
 
                     onTextChanged: {
-                        glucagonBox.doIt((MyGlobal.glucagonValue))
+                        doIt(MyGlobal.glucagonValue, repeater2);
                     }
                 }
 
@@ -1194,7 +1094,6 @@ Window {
                         }
                     }  //Column
 
-
                     Timer {
                         id: glucagonTimer
                         interval: 2000
@@ -1202,59 +1101,38 @@ Window {
                         running: true
                         triggeredOnStart: true
                         onTriggered: {
-                            glucagonBox.doIt(MyGlobal.glucagonValue);
+                            doIt(MyGlobal.glucagonValue, repeater2);
                         }
                     }  //Timer
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            var base = myBarNum * (myBarSpace + myBarHeight)
-                            var Y = mouseY
-                            if (Y < 0) Y = 0;
-                            if (Y > myBarBase) Y = myBarBase;
-                            var val = parseInt((myBarBase - Y) / 2)
-                            elementTextGlucagonVal.text = val
-                            MyGlobal.glucagonValue = val
-                            glucagonBox.doIt((MyGlobal.glucagonValue));
+                            var val = doVal(mouseY);
+                            doIt(val, repeater2);
+                            elementTextGlucagonVal.text = val;
+                            MyGlobal.glucagonValue = val;
                         } //onClicked:
 
                         onReleased: {
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextGlucagonVal.text = val
-                                MyGlobal.glucagonValue = val
-                                glucagonBox.doIt(val);
-                                submitTextField("Glucagon.value = " + elementTextGlucagonVal.text)
+                            var val = doVal(mouseY);
+                            doIt(val, repeater2);
+                            elementTextGlucagonVal.text = val;
+                            MyGlobal.glucagonValue = val;
+                            submitTextField("Glucagon.value=" + elementTextGlucagonVal.text);
                         }  //onReleased:
 
                         onPositionChanged: {
-                            var myI = 0;
-                            for (myI = 0; myI < repeater2.count; myI++) {
-
-                                if (repeater2.itemAt(myI).y >= mouseY) {
-                                    repeater2.itemAt(myI).color = MyStyle.barGraphOnColor
-                                } else {
-                                    repeater2.itemAt(myI).color = MyStyle.barGraphOffColor
-                                }
-
-                                var Y = mouseY
-                                if (Y < 0) Y = 0;
-                                if (Y > myBarBase) Y = myBarBase;
-                                var val = parseInt((myBarBase - Y) / 2)
-                                elementTextGlucagonVal.text = val
-                            }
+                            var val = doVal(mouseY)
+                            doIt(val, repeater2);
+                            elementTextGlucagonVal.text = val
+                            MyGlobal.glucagonValue = val
                         } //onPositionChanged
                     }  //MouseArea
                 }  //Rectangle
             }  //Glucagon
 
         } //Medications
-
-
-
 
 
         //---------------------------------------------------------------------------------------------  EKG
@@ -1849,11 +1727,9 @@ Window {
                         alarmImageColor.color = MyStyle.alarmColorOff;
                         buttonAlarmOn.color = MyStyle.alarmBtnBckGOff;
                     }
-
                     submitTextField("btnAlarm.value=" + (MyStyle.alarmImageBool ? "On" : "Off"));
-                    console.log("Button ALARM pressed " + (MyStyle.alarmImageBool ? "On" : "Off"));
                 }
-            } //end AlarmScreen
+            } //end buttonAlarmOn
 
 
 
@@ -1930,9 +1806,7 @@ Window {
                         vitalsImageColor.color = MyStyle.vitalsColorOff;
                         buttonVitalsOn.color = MyStyle.vitalsBtnBckGOff;
                     }
-
                     submitTextField("btnVitals.value=" + (MyStyle.vitalsImageBool ? "On" : "Off"));
-                    console.debug("Button VITALS pressed " + (MyStyle.vitalsImageBool ? "On" : "Off"));
                 }
             } //end Vitals
 
@@ -2009,9 +1883,7 @@ Window {
                         helpImageColor.color = MyStyle.helpColorOff;
                         buttonGetHelpOn.color = MyStyle.helpBtnBckGOff;
                     }
-
                     submitTextField("btnHelp.value=" + (MyStyle.helpImageBool ? "On" : "Off"));
-                    console.debug("Button HELP pressed " + (MyStyle.helpImageBool ? "On" : "Off"));
                 }
             } //end Help
 
@@ -2033,11 +1905,6 @@ Window {
                 from: main.buttonsAnimationX
                 to: 745
                 running: true
-            }
-
-            Component.onCompleted: {
-                //  sendPreviousScreen.connect(alarmsId.receivePreviousScreen)
-                //  startAnimation.connect(alarmsId.receiveAnimation)
             }
 
             //--- Reach Logo
@@ -2065,20 +1932,5 @@ Window {
             } //end Logo
         } //Rectangle - right side
     } //Rectangle - main stackup
-
-
-    /*
-    AlarmScreen {
-      id: alarmsId
-      stack: stackMain
-      isRunning: stackMain.currentIndex === 3
-      previousScreen: stackMain.currentIndex
-
-      Component.onCompleted: {
-        startAnimation.connect(main.receiveAnimation)
-        startAnimation.connect(alarmsId.receiveAnimation)
-      }
-    }
-*/
 
 } //Window

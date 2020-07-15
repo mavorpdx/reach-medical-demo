@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qtquickcontrols2.conf</file>
-        <file>AlarmScreen.qml</file>
         <file>MainScreen.qml</file>
         <file>Images/back-slash-large.png</file>
         <file>Images/back-slash.png</file>

@@ -3,11 +3,6 @@
 
 GlobalValues::GlobalValues(QObject * parent): QQmlPropertyMap(this, parent) {
    setObjectName("global");
-
-   insert("screenWidth", 800);
-   insert("screenHeight", 480);
-   insert("screenFactor", 480);
-
    insert("bpSysValue", 144);
    insert("bpDiaValue", 110);
 
@@ -43,6 +38,9 @@ GlobalValues::GlobalValues(QObject * parent): QQmlPropertyMap(this, parent) {
    insert("lastBolusValue", "3.11");
    insert("iOBValue", "2.5");
    insert("glucoseValue", "125");
+
+   qDebug() << "GLOBALS CONSTRUCTOR "  << value("screenWidth") ;
+
 }
 
 void GlobalValues::startEngine() {

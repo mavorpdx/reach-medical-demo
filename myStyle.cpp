@@ -24,21 +24,21 @@ StyleValues::StyleValues(QObject * parent): QQmlPropertyMap(this, parent) {
   insert("alarmBtnBckGOn", "lightGray");
   insert("alarmColorOff", "gray");
   insert("alarmBtnBckGOff", "lightGray");
-  insert("alarmFontColor", "white");
+  insert("alarmFontColor", "black");
 
   insert("vitalsImageBool", false);
   insert("vitalsColorOn", "yellow");
   insert("vitalsBtnBckGOn", "lightGray");
   insert("vitalsColorOff", "gray");
   insert("vitalsBtnBckGOff", "lightGray");
-  insert("vitalsFontColor", "white");
+  insert("vitalsFontColor", "black");
 
   insert("helpImageBool", false);
   insert("helpColorOn", "yellow");
   insert("helpBtnBckGOn", "lightGray");
   insert("helpColorOff", "gray");
   insert("helpBtnBckGOff", "lightGray");
-  insert("helpFontColor", "white");
+  insert("helpFontColor", "black");
 }
 
 void StyleValues::startEngine() {

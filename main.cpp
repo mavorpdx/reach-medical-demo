@@ -6,8 +6,8 @@
 #include <QCoreApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QScreen>
 
-#include "qmldebugger.h"
 #include "signal.h"
 #include "common.h"
 #include "mainviewcontroller.h"
@@ -45,6 +45,12 @@ int main(int argc, char *argv[])
     qmlRegisterType < Backlight > ("backlight.reachtech", 1, 0, "Backlight");
     qmlRegisterType < System > ("system.reachtech", 1, 0, "System");
 
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect  screenGeometry = screen->geometry();
+    MyGlobal.insert("screenWidth", screenGeometry.width());
+    MyGlobal.insert("screenHeight", screenGeometry.height());
+    MyGlobal.insert("screenFactor", screenGeometry.height());
+    qDebug() << "Screen Size is"  << MyGlobal.value("screenWidth").toInt() << "x" <<  MyGlobal.value("screenHeight").toInt();
 
     engine.load(QUrl(QStringLiteral("qrc:/MainScreen.qml")));
     if (engine.rootObjects().isEmpty())
